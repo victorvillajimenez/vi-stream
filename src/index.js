@@ -1,17 +1,36 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, {useEffect, useState} from 'react';
+import ReactDOM from 'react-dom';
+import useGeolocation from './hooks/useGeolocation';
+import Spinner from './components/Spinner';
+import Background from './components/Background';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const App = () => {
+  const {
+    latitude,
+    longitude,
+    season,
+    errorMsg
+  } = useGeolocation();
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+  const waitingUserResponse = !latitude && !errorMsg;
+  const color = waitingUserResponse ?
+    'dark' :
+    errorMsg ? 
+      'primary' :
+      season == 'winter' ?
+        'info' :
+        'warning';
+
+  return (
+    <Background color={color}>
+      {!waitingUserResponse &&
+        <div>Season: {season}</div>
+      }
+      {waitingUserResponse &&
+        <Spinner label='Please accept requests' />
+      }        
+    </Background>
+  );
+};
+
+ReactDOM.render(<App />, document.querySelector('#root'));
